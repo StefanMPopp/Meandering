@@ -1,0 +1,25 @@
+#!/bin/bash
+#dir="/media/stefan/HRM"
+dir="/home/stefan/Desktop/2020_clone"
+vid="$1" # e.g. T1
+cam="$2" # e.g. SW
+exp="HRM"
+
+echo "${col} " > ~/Desktop/progress # Writes current computing progress into a text file
+for pt in 01 02 03 04 05 06 07 08 09 10
+do
+ tic=$SECONDS
+ tgrabs -i ${dir}/allVids/${exp}_${vid}_${cam}${pt}.MP4 -s ${dir}/trex/tgrabs${cam}.settings -d $dir/tGrabOut &&
+ trex -i ${dir}/tGrabOut/${exp}_${vid}_${cam}${pt}.pv -s ${dir}/trex/trex${cam}.settings -d ${dir}/tracks -fishdata_dir ${exp}_${vid}_rawIndiv
+ toc=$(($SECONDS - tic)) # Computation time
+ echo "${cam}${pt} in ${toc}s" >> ~/Desktop/progress # Writes computing time to progress file for computing time estimation.
+done
+
+find ${dir}/tracks -name "*.csv" -type 'f' -size 63c -delete # deletes empty files (<63 bytes)
+
+framesListPath=${dir}/allVids/${exp}_${vid}_framesList.txt
+if test -f "$framesListPath"; then
+    if test -f "${exp}_${vid}_rawIndiv"; then
+        mv ${framesListPath} ${dir}/tracks/${exp}_${vid}_rawIndiv # Moves file with frame #s per video chunk to the folder w/ the current tracks. Needed for track concatenation in MATLAB tr1CatStitch 
+    fi
+fi

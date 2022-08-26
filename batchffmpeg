@@ -1,0 +1,74 @@
+#!/bin/bash
+dir="/home/stefan/Desktop/2020_clone" # highest common diectory path of input & output of videos
+dirIn='/HRM_W' # input path starting from dir
+dirOut='/allVids' # output path starting from dir
+
+vid="$1" # e.g. T1
+cam="$2" # e.g. NE
+st="$3" # start time in s, e.g. 12
+
+# From raw, long, unedited videos
+#ffmpeg -ss 0:00:${st} -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}01.MP4 &&
+#ffmpeg -ss 0:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}02.MP4 &&
+#ffmpeg -ss 1:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}03.MP4 &&
+#ffmpeg -ss 1:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}04.MP4 &&
+#ffmpeg -ss 2:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}05.MP4 &&
+#ffmpeg -ss 2:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}06.MP4 &&
+#ffmpeg -ss 3:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}07.MP4 &&
+#ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}08.MP4 &&
+#ffmpeg -ss 0:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:02 -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}09.MP4 &&
+#ffmpeg -ss 1:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:${st} -an -vf eq=contrast=2.6:brightness=0.5 -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}10.MP4
+
+#######################################################
+#                      Explanation                    #
+# -ss start time                                      #
+# -t  end time                                        #
+# -an sound not exported                              #
+# -vf video filter (increasing contrast & brigthness) #
+# -b  output bitrate                                  #
+#######################################################
+
+# Makes dictionary of how many frames each chunk contains for incrementing t in MATLAB tr1catStitch (trackCatFunTrex)
+let stFr="${st}"*25 # How many frames are cut from the start of the video
+let first=45000-${stFr} # #of frames of the first chunk
+let tenth=40150+${stFr} # #of frames of the 10th chunk (=last chunk of 2nd video)
+frames=(0 ${first} 45000 45000 45000 45000 45000 49550 45000 45000 ${tenth})
+printf "%s\n" "${frames[@]}" > ${dir}${dirOut}/HRM_$1_framesList.txt
+
+# From already brightness/contrast enhanced long videos to 30min videos
+ffmpeg -ss 0:00:${st} -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}01.MP4 &&
+ffmpeg -ss 0:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}02.MP4 &&
+ffmpeg -ss 1:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}03.MP4 &&
+ffmpeg -ss 1:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}04.MP4 &&
+ffmpeg -ss 2:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}05.MP4 &&
+ffmpeg -ss 2:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}06.MP4 &&
+ffmpeg -ss 3:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}07.MP4 &&
+ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}08.MP4 &&
+ffmpeg -ss 0:30:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:02 -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}09.MP4 &&
+ffmpeg -ss 1:00:00 -i ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4 -t 0:30:${st} -an -b:v 4M ${dir}${dirOut}/HRM_${vid}_${cam}10.MP4
+
+######################
+#   Codec Problems   #
+######################
+#ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4 -c copy -an ${dir}${dirIn}/HRM_${vid}_${cam}1.264
+#rm ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4
+#ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}07.264 -c copy -an ${dir}${dirIn}/HRM_${vid}_${cam}1.MP4
+#rm ${dir}${dirIn}/HRM_${vid}_${cam}07.264
+#ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}03.MP4 -c copy -an ${dir}${dirIn}/HRM_${vid}_${cam}2.264
+#rm ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4
+#ffmpeg -i ${dir}${dirIn}/HRM_${vid}_${cam}02.264 -c copy -an ${dir}${dirIn}/HRM_${vid}_${cam}2.MP4
+# rm -i ${dir}${dirIn}/HRM_${vid}_${cam}02.264
+
+#ffmpeg -i ${dir}${dirOut}/HRM_${vid}_${cam}07.MP4 -c copy -an ${dir}${dirOut}/HRM_${vid}_${cam}07.264
+#rm ${dir}${dirIn}/HRM_${vid}_${cam}07.MP4
+#ffmpeg -i ${dir}${dirOut}/HRM_${vid}_${cam}07.264 -c copy -an ${dir}${dirOut}/HRM_${vid}_${cam}07.MP4
+#ffmpeg -i ${dir}${dirOut}/HRM_${vid}_${cam}03.MP4 -c copy -an ${dir}${dirOut}/HRM_${vid}_${cam}03.264
+#rm ${dir}${dirIn}/HRM_${vid}_${cam}03.MP4
+#ffmpeg -i ${dir}${dirOut}/HRM_${vid}_${cam}03.264 -c copy -an ${dir}${dirOut}/HRM_${vid}_${cam}03.MP4
+
+###############################
+# Count frame numbers (separate command)
+###############################
+# ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 /media/stefan/HRM/allVids/HRM_T2_NW01.MP4
+
+
